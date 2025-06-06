@@ -125,7 +125,7 @@
     const json = {};
     formData.forEach((value, key) => json[key] = value);
 
-    fetch('https://your-backend-url.com/students', {
+    fetch('https://yhwohk6jei.execute-api.eu-north-1.amazonaws.com/prod', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(json)
