@@ -15,7 +15,7 @@
     </div>
     <div class="card-body">
       <form id="studentForm">
-        
+
         <div class="form-group">
           <label>Student's Name</label>
           <input type="text" class="form-control" name="studentName" required>
@@ -66,11 +66,74 @@
           <textarea class="form-control" name="note" rows="3"></textarea>
         </div>
 
+        <!-- PHOTO UPLOAD -->
+        <div class="form-group">
+          <label>Upload Photo</label>
+          <input type="file" class="form-control-file" id="photoUpload" accept="image/*">
+        </div>
+
+        <!-- CAMERA -->
+        <div class="form-group">
+          <label>Or Capture Photo</label><br/>
+          <video id="camera" width="320" height="240" autoplay class="border"></video><br/>
+          <button type="button" class="btn btn-sm btn-info mt-2" onclick="capturePhoto()">Capture</button>
+          <canvas id="capturedPhoto" width="320" height="240" style="display:none;"></canvas>
+        </div>
+
+        <input type="hidden" name="photoBase64" id="photoBase64" />
+
         <button type="submit" class="btn btn-success btn-block">Submit</button>
       </form>
     </div>
   </div>
 </div>
+
+<script>
+  // Webcam Setup
+  const video = document.getElementById('camera');
+  const canvas = document.getElementById('capturedPhoto');
+  const base64Input = document.getElementById('photoBase64');
+
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => { video.srcObject = stream; })
+    .catch(err => console.log("Camera not accessible:", err));
+
+  function capturePhoto() {
+    const context = canvas.getContext('2d');
+    canvas.style.display = 'block';
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const base64 = canvas.toDataURL('image/jpeg');
+    base64Input.value = base64;
+  }
+
+  // Upload to Base64
+  document.getElementById('photoUpload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        base64Input.value = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Handle Form Submission (you can modify as per backend)
+  document.getElementById('studentForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const json = {};
+    formData.forEach((value, key) => json[key] = value);
+
+    fetch('https://your-backend-url.com/students', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(json)
+    })
+    .then(res => res.ok ? alert('Submitted successfully!') : alert('Error submitting'))
+    .catch(() => alert('Submission failed'));
+  });
+</script>
 
 </body>
 </html>
