@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Admission Form</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+  <div class="card shadow-lg">
+    <div class="card-header text-center">
+      <h3>Student Admission Form</h3>
+    </div>
+    <div class="card-body">
+      <form id="studentForm">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" name="name" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+          <label>Father's Name</label>
+          <input type="text" name="fatherName" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+          <label>Mobile Number</label>
+          <input type="tel" name="mobile" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+          <label>Receipt No (Optional)</label>
+          <input type="text" name="receiptNo" class="form-control" />
+        </div>
+
+        <div class="form-group">
+          <label>Date of Birth</label>
+          <input type="date" name="dob" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+          <label>Others</label>
+          <textarea name="others" class="form-control"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Batch</label>
+          <select name="batch" class="form-control" id="batchSelect" required>
+            <option value="">Select Batch</option>
+            <!-- Batches will be loaded here dynamically -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Fee (Optional)</label>
+          <input type="text" name="fee" class="form-control" />
+        </div>
+
+        <div class="form-group">
+          <label>Upload Photo</label>
+          <input type="file" accept="image/*" id="photoInput" class="form-control-file" />
+        </div>
+
+        <div class="form-group">
+          <label>Or Capture Photo</label><br />
+          <video id="webcam" width="320" height="240" autoplay class="border"></video><br />
+          <button type="button" class="btn btn-info mt-2" onclick="capturePhoto()">Capture</button><br />
+          <canvas id="photoCanvas" width="320" height="240" style="display:none;"></canvas>
+        </div>
+
+        <input type="hidden" name="photo" id="photoData" />
+
+        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Webcam setup
+  const video = document.getElementById('webcam');
+  const canvas = document.getElementById('photoCanvas');
+  const photoInput = document.getElementById('photoData');
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => video.srcObject = stream)
+    .catch(err => console.log('Camera access denied', err));
+
+  function capturePhoto() {
+    const context = canvas.getContext('2d');
+    canvas.style.display = 'block';
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    photoInput.value = canvas.toDataURL('image/jpeg');
+  }
+
+  // Fetch batches from backend (replace URL with your backend endpoint)
+  $.get('https://your-backend-url.com/batches', function(data) {
+    data.forEach(batch => {
+      $('#batchSelect').append(`<option value="${batch.name}">${batch.name}</option>`);
+    });
+  });
+
+  // Handle file upload to base64
+  $('#photoInput').on('change', function(e) {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      $('#photoData').val(reader.result);
+    };
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Submit form
+  $('#studentForm').on('submit', function(e) {
+    e.preventDefault();
+    const formData = $(this).serialize();
+    $.post('https://your-backend-url.com/students', formData)
+      .done(() => alert('Student added successfully!'))
+      .fail(() => alert('Error submitting form.'));
+  });
+</script>
+
+</body>
+</html>
