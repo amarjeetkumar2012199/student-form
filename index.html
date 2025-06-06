@@ -68,34 +68,6 @@
 </div>
 
 <script>
-  // Webcam Setup
-  const video = document.getElementById('camera');
-  const canvas = document.getElementById('capturedPhoto');
-  const base64Input = document.getElementById('photoBase64');
-
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then(stream => { video.srcObject = stream; })
-    .catch(err => console.log("Camera not accessible:", err));
-
-  function capturePhoto() {
-    const context = canvas.getContext('2d');
-    canvas.style.display = 'block';
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const base64 = canvas.toDataURL('image/jpeg');
-    base64Input.value = base64;
-  }
-
-  // Upload to Base64
-  document.getElementById('photoUpload').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        base64Input.value = reader.result;
-      };
-      reader.readAsDataURL(file);
-    }
-  });
 
   // Handle Form Submission (you can modify as per backend)
   document.getElementById('studentForm').addEventListener('submit', function(e) {
