@@ -80,7 +80,7 @@
     const jsonData = {};
     formData.forEach((value, key) => jsonData[key] = value);
 
-    fetch('https://yhwohk6jei.execute-api.eu-north-1.amazonaws.com/prod', {
+    fetch('https://yhwohk6jei.execute-api.eu-north-1.amazonaws.com/prod/students', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
